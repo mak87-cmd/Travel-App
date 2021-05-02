@@ -1,14 +1,12 @@
 /* Global Variables */
-const apiKey = "87f0f6ef886a8b587936aaabca02febc";
-
-const baseURL = "http://api.openweathermap.org/data/2.5/weather";
+const baseURL = "http://api.geonames.org/";
 
 // document.getElementById('generate').addEventListener('click', performAction);
 
 // Write an async function in app.js that uses fetch() to make a GET request to the OpenWeatherMap API.
 function performAction(e) {
-    const zip = document.getElementById('zip').value;
-    getWeather(zip)
+    const city = document.getElementById('city').value;
+    getCity(city)
       .then(function(data) {
           console.log('inside performAction', data)
           // Create a new date instance dynamically with JS
@@ -34,11 +32,12 @@ const updateUI = async () => {
     }
 }
 
-const getWeather = async (zip) => {
-    const res = await fetch(`${baseURL}?zip=${zip}&appid=${apiKey}&units=imperial`)
+const getCity = async (city) => {
+    const res = await fetch(`${baseURL}search?q=${city}&maxRows=10&username=${username}`)
     try {
       const data = await res.json();
-      console.log('inside getWeather', data);
+      console.log('inside getCity', data);
+      const cityData = data.geonames[0];
       return data;
     } catch (error) {
       console.log("error", error);
