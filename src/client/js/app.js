@@ -3,7 +3,7 @@ const apiKey = "87f0f6ef886a8b587936aaabca02febc";
 
 const baseURL = "http://api.openweathermap.org/data/2.5/weather";
 
-document.getElementById('generate').addEventListener('click', performAction);
+// document.getElementById('generate').addEventListener('click', performAction);
 
 // Write an async function in app.js that uses fetch() to make a GET request to the OpenWeatherMap API.
 function performAction(e) {
@@ -62,3 +62,5 @@ const postData = async (url = '', data = {}) => {
         console.log('error', error);
     }
 }
+
+module.exports = { performAction }
