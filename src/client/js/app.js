@@ -1,6 +1,6 @@
 /* Global Variables */
-const baseURL = "http://api.geonames.org/";
-
+const geonamesBaseUrl = "http://api.geonames.org/";
+const weatherbitBaseUrl = "http://api.weatherbit.io";
 // document.getElementById('generate').addEventListener('click', performAction);
 
 // Write an async function in app.js that uses fetch() to make a GET request to the OpenWeatherMap API.
@@ -9,10 +9,7 @@ function performAction(e) {
     getCity(city)
       .then(function(data) {
           console.log('inside performAction', data)
-          // Create a new date instance dynamically with JS
-          const d = new Date();
-          const newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
-          const feelings = document.getElementById('feelings').value;
+          const cityInfo = data.geonames[0];
           postData('/addWeatherJournal', {temperature: data.main.temp, date: newDate, userResponse: feelings});
       })
       .then(updateUI())
@@ -33,7 +30,7 @@ const updateUI = async () => {
 }
 
 const getCity = async (city) => {
-    const res = await fetch(`${baseURL}search?q=${city}&maxRows=10&username=${username}`)
+    const res = await fetch(`${geonamesBaseUrl}search?q=${city}&maxRows=10&username=${username}`)
     try {
       const data = await res.json();
       console.log('inside getCity', data);
