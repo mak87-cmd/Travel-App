@@ -37,8 +37,11 @@ app.get('/all', function (req, res) {
     res.send(projectData)
 })
 
-app.post('/addWeatherJournal', function (req, res) {
-    projectData.temperature = req.body.temperature;
+app.post('/addTrip', function (req, res) {
+    console.log('request.body', req.body);
+    projectData.city = req.body.city;
     projectData.date = req.body.date;
-    projectData.userResponse = req.body.userResponse;
+    projectData.weather = req.body.weather;
+    projectData.image = req.body.image;
+    res.sendStatus(200);
 })
