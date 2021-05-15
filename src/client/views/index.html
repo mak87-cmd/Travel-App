@@ -6,25 +6,28 @@
 <link href="https://fonts.googleapis.com/css?family=Oswald:400,600,700|Ranga:400,700&display=swap" rel="stylesheet">
 </head>
  <body>
-<div id = "app">
-  <div class ="holder headline">
-    Weather Journal App
+<div id="app">
+  <div class="holder headline">
+    My Travel Planner
   </div>
-  <div class ="holder zip">
-    <label for="zip">Enter Zipcode here</label>
-    <input type="text" id="zip" placeholder="enter zip code here">
+  <div class="holder city">
+    <label for="city">Where do you want to go?</label>
+    <input type="text" id="city" placeholder="enter city here">
   </div>
-  <div class ="holder feel">
-    <label for="feelings">How are you feeling today?</label>
-    <textarea class= "myInput" id="feelings" placeholder="Enter your feelings here" rows="9" cols="50"></textarea>
-    <button id="generate" type = "submit"> Generate </button>
+  <div class="holder date">
+    <label for="date">When is your trip?</label>
+    <input type="date" id="start" name="trip-start">
+    <button id="generate" type="submit">Enter</button>
   </div>
-  <div class ="holder entry">
-    <div class = "title">Most Recent Entry</div>
-    <div id = "entryHolder">
-    <div id = "date"></div> 
-    <div id = "temp"></div>
-    <div id = "content"></div>
+  <div class="holder entry">
+    <div class="title">Your Trip</div>
+    <div id="entryHolder">
+    <div id="destination"></div>
+    <div id="date"></div> 
+    <div id="low-temp"></div>
+    <div id="high-temp"></div>
+    <div id="description"></div>
+    <div id="image"></div>
   </div>
   </div>
   </div>
