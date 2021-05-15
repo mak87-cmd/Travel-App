@@ -1,18 +1,40 @@
 /* Global Variables */
 const geonamesBaseUrl = "http://api.geonames.org/";
 const weatherbitBaseUrl = "http://api.weatherbit.io";
+const weatherbitBaseUrlCurrent = "http://api.weatherbit.io/v2.0/current";
+const weatherbitBaseUrlFuture = "http://api.weatherbit.io/v2.0/forecast/daily";
 // document.getElementById('generate').addEventListener('click', performAction);
 
 // Write an async function in app.js that uses fetch() to make a GET request to the OpenWeatherMap API.
 function performAction(e) {
     const city = document.getElementById('city').value;
+    console.log('city...', city);
     getCity(city)
       .then(function(data) {
           console.log('inside performAction', data)
-          const cityInfo = data.geonames[0];
-          postData('/addWeatherJournal', {temperature: data.main.temp, date: newDate, userResponse: feelings});
+          const city = data.geonames[0].name;
+          console.log('city...', city);
+          const date = document.getElementById('start').value;
+          console.log('date...', date);
+          getWeather(city, date);
+        //   postData('/addWeatherJournal', {temperature: data.main.temp, date: newDate, userResponse: feelings});
       })
+    
       .then(updateUI())
+}
+
+function getWeather(city, date) {
+    const key = process.env.WEATHERBIT_API_KEY;
+    const diff =  Math.floor(( Date.parse(date) - Date.now() ) / 86400000);
+    const apiUrl = diff < 7 ? weatherbitBaseUrlCurrent : weatherbitBaseUrlFuture;
+    fetch(`${apiUrl}?key=403d10bec1b34b16b33bf36cba9fe695&city=${city}`)
+      .then(function(res) { return res.json() })
+      .then(function(data) {
+          console.log(data);
+      })
+      .catch(function(e) {
+          console.log(e);
+      })
 }
 
 const updateUI = async () => {
@@ -30,7 +52,7 @@ const updateUI = async () => {
 }
 
 const getCity = async (city) => {
-    const res = await fetch(`${geonamesBaseUrl}search?q=${city}&maxRows=10&username=${username}`)
+    const res = await fetch(`${geonamesBaseUrl}searchJSON?q=${city}&maxRows=10&username=mak87`)
     try {
       const data = await res.json();
       console.log('inside getCity', data);
