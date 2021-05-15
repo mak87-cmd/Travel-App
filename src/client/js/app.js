@@ -1,8 +1,10 @@
 /* Global Variables */
-const geonamesBaseUrl = "http://api.geonames.org/";
-const weatherbitBaseUrl = "http://api.weatherbit.io";
-const weatherbitBaseUrlCurrent = "http://api.weatherbit.io/v2.0/current";
-const weatherbitBaseUrlFuture = "http://api.weatherbit.io/v2.0/forecast/daily";
+const geonamesBaseUrl = 'http://api.geonames.org/';
+const weatherbitBaseUrl = 'http://api.weatherbit.io';
+const weatherbitBaseUrlCurrent = 'http://api.weatherbit.io/v2.0/current';
+const weatherbitBaseUrlFuture = 'http://api.weatherbit.io/v2.0/forecast/daily';
+// https://pixabay.com/api/?key=21439262-38bf3d4bd5afe814d508e3e61&q=london
+const pixabayBaseUrl = 'https://pixabay.com/api/';
 // document.getElementById('generate').addEventListener('click', performAction);
 
 // Write an async function in app.js that uses fetch() to make a GET request to the OpenWeatherMap API.
@@ -10,31 +12,54 @@ function performAction(e) {
     const city = document.getElementById('city').value;
     console.log('city...', city);
     getCity(city)
-      .then(function(data) {
-          console.log('inside performAction', data)
-          const city = data.geonames[0].name;
-          console.log('city...', city);
-          const date = document.getElementById('start').value;
-          console.log('date...', date);
-          getWeather(city, date);
-        //   postData('/addWeatherJournal', {temperature: data.main.temp, date: newDate, userResponse: feelings});
+        .then(async function(data) {
+            console.log('inside performAction', data)
+            const city = data.geonames[0].name;
+            console.log('city...', city);
+            const date = document.getElementById('start').value;
+            console.log('date...', date);
+            const weather = await getWeather(city, date);
+            console.log('weather', weather);
+            const image = await getImage(city);
+            console.log('image...', image);
+            // getImage(city)
+            //   postData('/addWeatherJournal', {temperature: data.main.temp, date: newDate, userResponse: feelings});
       })
     
       .then(updateUI())
 }
 
-function getWeather(city, date) {
-    const key = process.env.WEATHERBIT_API_KEY;
+const getCity = async (city) => {
+    const res = await fetch(`${geonamesBaseUrl}searchJSON?q=${city}&maxRows=10&username=mak87`)
+    try {
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.log('error', error);
+    }
+}
+
+const getWeather = async (city, date) => {
     const diff =  Math.floor(( Date.parse(date) - Date.now() ) / 86400000);
     const apiUrl = diff < 7 ? weatherbitBaseUrlCurrent : weatherbitBaseUrlFuture;
-    fetch(`${apiUrl}?key=403d10bec1b34b16b33bf36cba9fe695&city=${city}`)
-      .then(function(res) { return res.json() })
-      .then(function(data) {
-          console.log(data);
-      })
-      .catch(function(e) {
-          console.log(e);
-      })
+    const res = await fetch(`${apiUrl}?key=403d10bec1b34b16b33bf36cba9fe695&city=${city}`)
+    try {
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.log('error', error);
+    }
+}
+
+const getImage = async (city) => {
+    const res = await fetch(`${pixabayBaseUrl}?key=21439262-38bf3d4bd5afe814d508e3e61&q=${city}`);
+    try {
+        const data = await res.json();
+        const image = data.hits[0].largeImageURL;
+        return image;
+    } catch (error) {
+        console.log('error', error);
+    }
 }
 
 const updateUI = async () => {
@@ -48,18 +73,6 @@ const updateUI = async () => {
         document.getElementById('content').innerHTML = projectData.userResponse;
     } catch(error) {
         console.log('error', error);
-    }
-}
-
-const getCity = async (city) => {
-    const res = await fetch(`${geonamesBaseUrl}searchJSON?q=${city}&maxRows=10&username=mak87`)
-    try {
-      const data = await res.json();
-      console.log('inside getCity', data);
-      const cityData = data.geonames[0];
-      return data;
-    } catch (error) {
-      console.log("error", error);
     }
 }
 
