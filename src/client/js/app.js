@@ -8,25 +8,22 @@ const pixabayBaseUrl = 'https://pixabay.com/api/';
 // document.getElementById('generate').addEventListener('click', performAction);
 
 // Write an async function in app.js that uses fetch() to make a GET request to the OpenWeatherMap API.
-function performAction(e) {
-    const city = document.getElementById('city').value;
+async function performAction(e) {
+    const userCity = document.getElementById('city').value;
+    console.log('userCity...', userCity);
+    const cityData = await getCity(userCity);
+    console.log('cityData...', cityData);
+    const city = cityData.geonames[0].name;
     console.log('city...', city);
-    getCity(city)
-        .then(async function(data) {
-            console.log('inside performAction', data)
-            const city = data.geonames[0].name;
-            console.log('city...', city);
-            const date = document.getElementById('start').value;
-            console.log('date...', date);
-            const weather = await getWeather(city, date);
-            console.log('weather', weather);
-            const image = await getImage(city);
-            console.log('image...', image);
-            // getImage(city)
-            //   postData('/addWeatherJournal', {temperature: data.main.temp, date: newDate, userResponse: feelings});
-      })
-    
-      .then(updateUI())
+    const date = document.getElementById('start').value;
+    console.log('date...', date);
+    const weather = await getWeather(city, date);
+    console.log('weather', weather);
+    const image = await getImage(city);
+    console.log('image...', image);
+    await postData('/addTrip', {city, date, weather, image});
+    console.log('after postData');
+    updateUI();
 }
 
 const getCity = async (city) => {
@@ -41,11 +38,26 @@ const getCity = async (city) => {
 
 const getWeather = async (city, date) => {
     const diff =  Math.floor(( Date.parse(date) - Date.now() ) / 86400000);
-    const apiUrl = diff < 7 ? weatherbitBaseUrlCurrent : weatherbitBaseUrlFuture;
-    const res = await fetch(`${apiUrl}?key=403d10bec1b34b16b33bf36cba9fe695&city=${city}`)
+    const isCurrent = diff < 7;
+    const apiUrl = isCurrent ? weatherbitBaseUrlCurrent : weatherbitBaseUrlFuture;
+    const res = await fetch(`${apiUrl}?key=403d10bec1b34b16b33bf36cba9fe695&city=${city}&units=I`)
     try {
         const data = await res.json();
-        return data;
+        let weather;
+        if (isCurrent) {
+            console.log('inside getWeather', data.data[0]);
+            weather = {
+                temp: data.data[0].temp,
+                description: data.data[0].weather.description
+            }
+        } else {
+            weather = {
+                lowTemp: data.data[15].low_temp,
+                highTemp: data.data[15].high_temp,
+                description: data.data[15].weather.description
+            }
+        }
+        return weather;
     } catch (error) {
         console.log('error', error);
     }
@@ -68,10 +80,18 @@ const updateUI = async () => {
     const request = await fetch('/all');
     try {
         const projectData = await request.json();
+        console.log('projectData...', projectData);
+        document.getElementById('destination').innerHTML = projectData.city;
         document.getElementById('date').innerHTML = projectData.date;
-        document.getElementById('temp').innerHTML = projectData.temperature;
-        document.getElementById('content').innerHTML = projectData.userResponse;
-    } catch(error) {
+        document.getElementById('low-temp').innerHTML = projectData.weather.lowTemp || projectData.weather.temp;
+        if (projectData.weather.highTemp) {
+            document.getElementById('high-temp').innerHTML = projectData.weather.highTemp;
+        }
+        document.getElementById('description').innerHTML = projectData.weather.description;
+        const img = document.createElement('img');
+        img.src = projectData.image;
+        document.getElementById('image').appendChild(img);
+    } catch (error) {
         console.log('error', error);
     }
 }
@@ -87,7 +107,6 @@ const postData = async (url = '', data = {}) => {
     });
     try {
         const newData = await response.json();
-        console.log(newData);
         return newData
     } catch (error) {
         console.log('error', error);
