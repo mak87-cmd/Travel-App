@@ -15,13 +15,17 @@ async function performAction(e) {
     console.log('cityData...', cityData);
     const city = cityData.geonames[0].name;
     console.log('city...', city);
-    const date = document.getElementById('start').value;
-    console.log('date...', date);
-    const weather = await getWeather(city, date);
+    const startDate = document.getElementById('start').value;
+    console.log('startDate...', startDate);
+    const endDate = document.getElementById('end').value;
+    console.log('end date', endDate);
+    const lengthOfTrip = diffBetweenDates(startDate, endDate);
+    console.log('length of trip', lengthOfTrip);
+    const weather = await getWeather(city, startDate);
     console.log('weather', weather);
     const image = await getImage(city);
     console.log('image...', image);
-    await postData('/addTrip', {city, date, weather, image});
+    await postData('/addTrip', {city, startDate, endDate, lengthOfTrip, weather, image});
     console.log('after postData');
     updateUI();
 }
@@ -37,7 +41,9 @@ const getCity = async (city) => {
 }
 
 const getWeather = async (city, date) => {
-    const diff =  Math.floor(( Date.parse(date) - Date.now() ) / 86400000);
+    // const diff =  Math.floor(( Date.parse(date) - Date.now() ) / 86400000);
+    const now = Date.now();
+    const diff = diffBetweenDates(now, date);
     const isCurrent = diff < 7;
     const apiUrl = isCurrent ? weatherbitBaseUrlCurrent : weatherbitBaseUrlFuture;
     const res = await fetch(`${apiUrl}?key=403d10bec1b34b16b33bf36cba9fe695&city=${city}&units=I`)
@@ -67,7 +73,7 @@ const getImage = async (city) => {
     const res = await fetch(`${pixabayBaseUrl}?key=21439262-38bf3d4bd5afe814d508e3e61&q=${city}`);
     try {
         const data = await res.json();
-        const image = data.hits[0].largeImageURL;
+        const image = data.hits[0].webformatURL;
         return image;
     } catch (error) {
         console.log('error', error);
@@ -82,14 +88,21 @@ const updateUI = async () => {
         const projectData = await request.json();
         console.log('projectData...', projectData);
         document.getElementById('destination').innerHTML = projectData.city;
-        document.getElementById('date').innerHTML = projectData.date;
+        document.getElementById('start-date').innerHTML = projectData.startDate;
+        document.getElementById('end-date').innerHTML = projectData.endDate;
+        document.getElementById('length-of-trip').innerHTML = projectData.lengthOfTrip;
         document.getElementById('low-temp').innerHTML = projectData.weather.lowTemp || projectData.weather.temp;
         if (projectData.weather.highTemp) {
             document.getElementById('high-temp').innerHTML = projectData.weather.highTemp;
         }
         document.getElementById('description').innerHTML = projectData.weather.description;
+        const existingImage = document.getElementById('search-image-result');
+        if (existingImage) {
+            existingImage.remove();
+        }
         const img = document.createElement('img');
         img.src = projectData.image;
+        img.id = 'search-image-result';
         document.getElementById('image').appendChild(img);
     } catch (error) {
         console.log('error', error);
@@ -111,6 +124,10 @@ const postData = async (url = '', data = {}) => {
     } catch (error) {
         console.log('error', error);
     }
+}
+
+const diffBetweenDates = (startDate, endDate) => {
+    return Math.floor(( Date.parse(endDate) - Date.parse(startDate) ) / 86400000);
 }
 
 module.exports = { performAction }
