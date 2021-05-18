@@ -87,15 +87,17 @@ const updateUI = async () => {
     try {
         const projectData = await request.json();
         console.log('projectData...', projectData);
-        document.getElementById('destination').innerHTML = projectData.city;
-        document.getElementById('start-date').innerHTML = projectData.startDate;
-        document.getElementById('end-date').innerHTML = projectData.endDate;
-        document.getElementById('length-of-trip').innerHTML = projectData.lengthOfTrip;
-        document.getElementById('low-temp').innerHTML = projectData.weather.lowTemp || projectData.weather.temp;
-        if (projectData.weather.highTemp) {
-            document.getElementById('high-temp').innerHTML = projectData.weather.highTemp;
+        document.getElementById('destination').innerHTML = `City: ${projectData.city}`;
+        document.getElementById('start-date').innerHTML = `Start Date: ${projectData.startDate}`;
+        document.getElementById('end-date').innerHTML = `End Date: ${projectData.endDate}`;
+        document.getElementById('length-of-trip').innerHTML = `Length of Trip: ${projectData.lengthOfTrip}`;
+        if (projectData.weather.temp) {
+            document.getElementById('temp').innerHTML = `Current Temperature: ${projectData.weather.temp}`;
+        } else {
+            document.getElementById('low-temp').innerHTML = `Low Temperature: ${projectData.weather.lowTemp}`;
+            document.getElementById('high-temp').innerHTML = `High Temperature: ${projectData.weather.highTemp}`;
         }
-        document.getElementById('description').innerHTML = projectData.weather.description;
+        document.getElementById('description').innerHTML = `Forecast Conditions: ${projectData.weather.description}`;
         const existingImage = document.getElementById('search-image-result');
         if (existingImage) {
             existingImage.remove();
