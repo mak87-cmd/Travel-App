@@ -40,7 +40,9 @@ app.get('/all', function (req, res) {
 app.post('/addTrip', function (req, res) {
     console.log('request.body', req.body);
     projectData.city = req.body.city;
-    projectData.date = req.body.date;
+    projectData.startDate = req.body.startDate;
+    projectData.endDate = req.body.endDate;
+    projectData.lengthOfTrip = req.body.lengthOfTrip;
     projectData.weather = req.body.weather;
     projectData.image = req.body.image;
     res.sendStatus(200);
