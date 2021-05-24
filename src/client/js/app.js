@@ -1,37 +1,24 @@
 /* Global Variables */
 const geonamesBaseUrl = 'http://api.geonames.org/';
-const weatherbitBaseUrl = 'http://api.weatherbit.io';
 const weatherbitBaseUrlCurrent = 'http://api.weatherbit.io/v2.0/current';
 const weatherbitBaseUrlFuture = 'http://api.weatherbit.io/v2.0/forecast/daily';
-// https://pixabay.com/api/?key=21439262-38bf3d4bd5afe814d508e3e61&q=london
 const pixabayBaseUrl = 'https://pixabay.com/api/';
-// document.getElementById('generate').addEventListener('click', performAction);
 
-// Write an async function in app.js that uses fetch() to make a GET request to the OpenWeatherMap API.
 async function performAction(e) {
     const userCity = document.getElementById('city').value;
-    console.log('userCity...', userCity);
     const cityData = await getCity(userCity);
-    console.log('cityData...', cityData);
     const city = cityData.geonames[0].name;
-    console.log('city...', city);
     const startDate = document.getElementById('start').value;
-    console.log('startDate...', startDate);
     const endDate = document.getElementById('end').value;
-    console.log('end date', endDate);
     const lengthOfTrip = diffBetweenDates(startDate, endDate);
-    console.log('length of trip', lengthOfTrip);
     const weather = await getWeather(city, startDate);
-    console.log('weather', weather);
     const image = await getImage(city);
-    console.log('image...', image);
     await postData('/addTrip', {city, startDate, endDate, lengthOfTrip, weather, image});
-    console.log('after postData');
     updateUI();
 }
 
 const getCity = async (city) => {
-    const res = await fetch(`${geonamesBaseUrl}searchJSON?q=${city}&maxRows=10&username=mak87`)
+    const res = await fetch(`${geonamesBaseUrl}searchJSON?q=${city}&maxRows=10&username=mak87`);
     try {
         const data = await res.json();
         return data;
@@ -41,17 +28,15 @@ const getCity = async (city) => {
 }
 
 const getWeather = async (city, date) => {
-    // const diff =  Math.floor(( Date.parse(date) - Date.now() ) / 86400000);
     const now = Date.now();
     const diff = diffBetweenDates(now, date);
     const isCurrent = diff < 7;
     const apiUrl = isCurrent ? weatherbitBaseUrlCurrent : weatherbitBaseUrlFuture;
-    const res = await fetch(`${apiUrl}?key=403d10bec1b34b16b33bf36cba9fe695&city=${city}&units=I`)
+    const res = await fetch(`${apiUrl}?key=403d10bec1b34b16b33bf36cba9fe695&city=${city}&units=I`);
     try {
         const data = await res.json();
         let weather;
         if (isCurrent) {
-            console.log('inside getWeather', data.data[0]);
             weather = {
                 temp: data.data[0].temp,
                 description: data.data[0].weather.description
@@ -86,7 +71,6 @@ const updateUI = async () => {
     const request = await fetch('/all');
     try {
         const projectData = await request.json();
-        console.log('projectData...', projectData);
         document.getElementById('destination').innerHTML = `City: ${projectData.city}`;
         document.getElementById('start-date').innerHTML = `Start Date: ${projectData.startDate}`;
         document.getElementById('end-date').innerHTML = `End Date: ${projectData.endDate}`;
@@ -122,7 +106,7 @@ const postData = async (url = '', data = {}) => {
     });
     try {
         const newData = await response.json();
-        return newData
+        return newData;
     } catch (error) {
         console.log('error', error);
     }
