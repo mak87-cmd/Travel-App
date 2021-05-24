@@ -134,3 +134,17 @@ button:focus {
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     font-size: 26px;
 } 
+
+@media screen and (max-width: 800px) {
+    #user-input {
+        grid-row: 2;
+        grid-column: 1/4;
+        width: 100%;
+    }
+
+    #trip-details {
+        grid-row: 3;
+        grid-column: 1/4;
+        width: 100%;
+    }
+  }
