@@ -47,3 +47,5 @@ app.post('/addTrip', function (req, res) {
     projectData.image = req.body.image;
     res.sendStatus(200);
 })
+
+module.exports = {app};
